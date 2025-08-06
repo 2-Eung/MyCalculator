@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div> <!-- 계산기 틀 0-->
+    <div>
+        <h1>계산기</h1>
+    </div> <!-- 제목?창 1-->
+
+    <div>
+        <div th:text="${inputPanels}"></div>
+    </div> <!-- inputPanels 창 2-->
+
+    <div>
+        <div th:if="${calError}" th:text="${calError}"></div>
+    </div> <!-- calError 창 3-->
+
+    <div>
+        <div th:text="${result}"></div>
+    </div> <!-- result 창 4-->
+
+    <div>
+
+        <div th:text="${underPoint == -1 ? '소수점 자리수 : default' : '소수점 자리수 : ' + underPoint}"></div>
+        <form th:action="@{/calculator/underPointUpDown}" method="post">
+            <input type="hidden" name="underPoint" th:value="${underPoint}" />
+            <input type="hidden" name="inputPanels" th:value="${inputPanels}" />
+            <input type="hidden" name="result" th:value="${result}" />
+            <button type="submit" name="underPointDefaultButton" th:value="-1" >Default</button>
+            <button type="submit" name="underPointUpButton" th:value="1"   th:disabled="${underPoint >= 16}">Up</button>
+            <button type="submit" name="underPointDownButton" th:value="-1" th:disabled="${underPoint <= 0}">Down</button>
+        </form>
+    </div> <!-- 소수점표기 창  7-->
+
+    <div>
+        <form th:action="@{/calculator/makeInputPanels}" method="post">
+            <input type="hidden" name="inputPanels" th:value="${inputPanels}" />
+            <input type="hidden" name="result" th:value="${result}" />
+            <input type="hidden" name="underPoint" th:value="${underPoint}" />
+            <div>
+                <button type="submit" name="inputButton" th:value="'('">(</button>
+                <button type="submit" name="inputButton" th:value="')'">)</button>
+                <button type="submit" name="inputButton" th:formaction="@{/calculator/allDeleteInputPanels}">C</button>
+                <button type="submit" name="inputButton" th:formaction="@{/calculator/deleteInputPanels}"><-</button>
+            </div>
+            <div>
+                <button type="submit" name="inputButton" th:value="'7'">7</button>
+                <button type="submit" name="inputButton" th:value="'8'">8</button>
+                <button type="submit" name="inputButton" th:value="'9'">9</button>
+                <button type="submit" name="inputButton" th:value="'+'">+</button>
+            </div>
+            <div>
+                <button type="submit" name="inputButton" th:value="'4'">4</button>
+                <button type="submit" name="inputButton" th:value="'5'">5</button>
+                <button type="submit" name="inputButton" th:value="'6'">6</button>
+                <button type="submit" name="inputButton" th:value="'-'">-</button>
+            </div>
+            <div>
+                <button type="submit" name="inputButton" th:value="'1'">1</button>
+                <button type="submit" name="inputButton" th:value="'2'">2</button>
+                <button type="submit" name="inputButton" th:value="'3'">3</button>
+                <button type="submit" name="inputButton" th:value="'*'">*</button>
+            </div>
+            <div>
+                <button type="submit" name="inputButton" th:value="'0'">0</button>
+                <button type="submit" name="inputButton" th:value="'000'">000</button>
+                <button type="submit" name="inputButton" th:value="'.'">.</button>
+                <button type="submit" name="inputButton" th:value="'/'">/</button>
+            </div>
+            <div>
+                <button type="submit" name="inputButton" th:value="'('">(</button>
+                <button type="submit" name="inputButton" th:value="')'">)</button>
+                <button type="submit" name="inputButton" th:formaction="@{/calculator/makeResult}">=</button>
+            </div>
+        </form>
+    </div> <!-- button 들 8-->
+</div> <!-- 계산기 틀 0-->
+
+
+<div><form th:action="@{/calculator/login}" th:object="${userSignupDto}" method="post"> <!-- login 틀 9-->
+
+    <div th:unless="${user}" type="hidden"> <!-- 비로그인시 보이는 틀-->
+        <div>
+            <label>
+                userName :
+                <input type="text" th:field="*{userName}" />
+            </label>
+        </div> <!-- userName 입력 창 10-->
+
+        <div>
+            <lavel>
+                password :
+                <input type="password" th:field="*{password}" />
+            </lavel>
+        </div> <!-- password 입력 창 11-->
+
+        <div>
+            <div th:if="${loginError}" th:text="${loginError}"></div>
+        </div> <!-- loginError 창 12-->
+
+        <div>
+            <button type="submit">로그인</button>
+        </div> <!-- 로그인 버튼 13-->
+
+        <div>
+            <button type="submit" th:formaction="@{/signup}">회원가입</button>
+        </div> <!-- 회원가입 버튼 14-->
+
+        <div>
+            <button type="submit" th:alert="이용방법" >이용방법</button>
+        </div> <!-- 이용방법 15-->
+    </div> <!-- 비로그인시 보이는 틀-->
+
+    <div th:if="${user}" type="hidden"> <!-- 로그인시 보이는 틀-->
+
+        <div>
+            <div th:text="${loginUserName} + ' 님 환영합니다.'"></div>
+        </div><!-- 접속한유저알림창 -->
+
+        <div>
+            <button type="submit" th:formaction="@{/calculator/logout}">로그아웃</button>
+        </div> <!-- 로그아웃버튼 15-->
+
+        <div>
+            <button type="submit" th:alert="이용방법" >이용방법</button>
+        </div> <!-- 이용방법 15-->
+    </div> <!-- 로그인시 보이는 틀-->
+
+</form></div> <!-- login 틀 9-->                                                        <!-- login 틀 9-->
+
+
+<div>
+    <div th:if="${user == null}">
+        기록 목록 (로그인시 이용 가능)
+    </div>
+
+    <div th:if="${user != null && notFixedList.size() == 0}">
+        기록 이 없습니다.
+    </div>
+
+    <div th:if="${notFixedList}">
+        <table>
+            <thead>
+            <tr>
+                <th>식</th>
+                <th>값</th>
+                <th>액션</th>
+            </tr>
+            </thead>
+            <tbody th:each="notFixed: ${notFixedList}">
+            <tr>
+                <td th:text="${notFixed.calculatorInputPanels}"></td>
+                <td th:text="${notFixed.calculatorRes}"></td>
+                <td>
+                    <form th:action="@{/calculator/fixedRes}" method="post">
+                        <input type="hidden" name="inputPanels" th:value="${inputPanels}" />
+                        <input type="hidden" name="result" th:value="${result}" />
+                        <input type="hidden" name="underPoint" th:value="${underPoint}" />
+                        <input type="hidden" name="logId" th:value="${notFixed.id}" />
+                        <button type="submit" th:disabled="${fixedList.size() >= 5}" >즐겨찾기 추가</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div><!-- 일반기록 목록 16-->
+
+<div>
+    <div th:if="${user == null}">
+        즐겨찾기 목록 (로그인시 이용 가능)
+    </div>
+
+    <div th:if="${user != null && fixedList.size() == 0}">
+        즐겨찾기 가 없습니다.
+    </div>
+
+    <div th:if="${fixedList}">
+        <table>
+            <thead>
+            <tr>
+                <th>식</th>
+                <th>값</th>
+                <th>액션</th>
+            </tr>
+            </thead>
+            <tbody th:each="fixed: ${fixedList}">
+            <tr>
+                <td th:text="${fixed.calculatorInputPanels}"></td>
+                <td th:text="${fixed.calculatorRes}"></td>
+                <td>
+                    <form th:action="@{/calculator/fixedDelete}" method="post">
+                        <input type="hidden" name="inputPanels" th:value="${inputPanels}" />
+                        <input type="hidden" name="result" th:value="${result}" />
+                        <input type="hidden" name="underPoint" th:value="${underPoint}" />
+                        <input type="hidden" name="logId" th:value="${fixed.id}" />
+                        <button type="submit">즐겨찾기 제거</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div> <!-- 즐겨찾기 목록 17-->
+
+</body>
+</html>
